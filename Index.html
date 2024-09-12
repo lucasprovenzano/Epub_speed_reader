@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPUB Reader</title>
+</head>
+<body>
+    <h1>EPUB File Information</h1>
+    <input type="file" id="fileInput" accept=".epub"/>
+    <button onclick="loadEPUB()">Load EPUB</button>
+
+    <div id="info">
+        <h2>File Info:</h2>
+        <p id="title"></p>
+        <p id="author"></p>
+        <p id="chapters"></p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/epub.js/0.3.88/epub.min.js"></script>
+    <script>
+        function loadEPUB() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const book = ePub(e.target.result);
+
+                    book.loaded.metadata.then(meta => {
+                        document.getElementById('title').innerText = "Title: " + meta.title;
+                        document.getElementById('author').innerText = "Author: " + meta.creator;
+                    });
+
+                    book.loaded.spine.then(spine => {
+                        const chapterCount = spine.items.length;
+                        document.getElementById('chapters').innerText = "Number of chapters: " + chapterCount;
+                    });
+                };
+
+                reader.readAsArrayBuffer(file);
+            } else {
+                alert("Please select a file.");
+            }
+        }
+    </script>
+</body>
+</html>
